@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-     public class BuggyController : BaseApiController
+    public class BuggyController : BaseApiController
     {
         private readonly StoreContext _context;
         public BuggyController(StoreContext context)
@@ -19,7 +19,7 @@ namespace API.Controllers
 
             if (thing == null) 
             {
-                return NotFound(new ApiResponse(404));                
+                return NotFound(new ApiResponse(404));
             }
 
             return Ok();
@@ -47,4 +47,4 @@ namespace API.Controllers
             return Ok();
         }
     }
-} 
+}
