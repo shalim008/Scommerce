@@ -10,9 +10,10 @@ using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 namespace API.Controllers
 {
-public class AccountController : BaseApiController
+    public class AccountController : BaseApiController
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
@@ -55,7 +56,7 @@ public class AccountController : BaseApiController
             return _mapper.Map<Address, AddressDto>(user.Address);
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPut("address")]
         public async Task<ActionResult<AddressDto>> UpdateUserAddress(AddressDto address)
         {
@@ -77,7 +78,7 @@ public class AccountController : BaseApiController
 
             if (user == null) return Unauthorized(new ApiResponse(401));
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, true);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
             if (!result.Succeeded) return Unauthorized(new ApiResponse(401));
 
@@ -92,6 +93,11 @@ public class AccountController : BaseApiController
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
+            if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
+            {
+                return new BadRequestObjectResult(new ApiValidationErrorResponse{Errors = new []{"Email address is in use"}});
+            }
+
             var user = new AppUser
             {
                 DisplayName = registerDto.DisplayName,
@@ -111,4 +117,4 @@ public class AccountController : BaseApiController
             };
         }
     }
-}
+} 
