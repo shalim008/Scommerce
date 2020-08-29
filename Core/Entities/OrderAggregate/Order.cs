@@ -32,4 +32,4 @@ namespace Core.Entities.OrderAggregate
             return Subtotal + DeliveryMethod.Price;
         }
     }
-}
+} 
