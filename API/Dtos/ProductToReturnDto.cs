@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace API.Dtos
 {
     public class ProductToReturnDto
@@ -9,5 +11,9 @@ namespace API.Dtos
         public string PictureUrl { get; set; }
         public string ProductType { get; set; }
         public string ProductBrand { get; set; }
+         public IReadOnlyList<ProductVariationsDto> ProductVariations { get; set; }
+        public IReadOnlyList<ProductImageDto> ProductImages { get; set; }
+        public IReadOnlyList<ProductAttributeDto> ProductAttribute { get; set; }
+        public IReadOnlyList<ProductAttributeValuesDto> ProductAttributeValues { get; set; }
     }
 }

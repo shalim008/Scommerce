@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { IProduct } from 'src/app/shared/models/product';
+import { IProduct, IProductAttribute, IProductAttributeValues } from 'src/app/shared/models/product';
 import { ShopService } from '../shop.service';
 import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbService } from 'xng-breadcrumb';
 import { BasketService } from 'src/app/basket/basket.service';
+import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from '@kolkov/ngx-gallery';
 
 @Component({
   selector: 'app-product-details',
@@ -13,6 +14,8 @@ import { BasketService } from 'src/app/basket/basket.service';
 export class ProductDetailsComponent implements OnInit {
   product: IProduct;
   quantity = 1;
+  galleryOptions: NgxGalleryOptions[];
+  galleryImages: NgxGalleryImage[];
   constructor(private shopService: ShopService,
               private activateRoute: ActivatedRoute,
               private bcService: BreadcrumbService,
@@ -21,11 +24,59 @@ export class ProductDetailsComponent implements OnInit {
               }
 
   ngOnInit(): void {
+ 
+
+    this.galleryOptions = [
+      {
+          width: '600px',
+          height: '400px',
+          thumbnailsColumns: 4,
+          imageAnimation: NgxGalleryAnimation.Slide
+      },
+      // max-width 800
+      {
+          breakpoint: 800,
+          width: '100%',
+          height: '600px',
+          imagePercent: 80,
+          thumbnailsPercent: 20,
+          thumbnailsMargin: 20,
+          thumbnailMargin: 20
+      },
+      // max-width 400
+      {
+          breakpoint: 400,
+          preview: false
+      }
+  ];
+   
+
     this.loadProduct();
+
+  //   this.galleryImages = [
+  //     {
+  //         small: 'https://i.imgur.com/DhKkTrG.jpg',
+  //         medium: 'https://i.imgur.com/DhKkTrG.jpg',
+  //         big: 'https://i.imgur.com/DhKkTrG.jpg'
+  //     },
+  //     {
+  //         small: 'https://i.imgur.com/KZpuufK.jpg',
+  //         medium: 'https://i.imgur.com/KZpuufK.jpg',
+  //         big: 'https://i.imgur.com/KZpuufK.jpg'
+  //     },
+  //     {
+  //         small: 'https://i.imgur.com/KZpuufK.jpg',
+  //         medium: 'https://i.imgur.com/KZpuufK.jpg',
+  //         big: 'https://i.imgur.com/KZpuufK.jpg'
+  //     }
+  // ];
+
+
   }
 
   // tslint:disable-next-line: typedef
   addItemToBasket(){
+    console.log(this.product);
     this.basketService.addItemToBasket(this.product, this.quantity);
   }
 
@@ -43,13 +94,35 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   // tslint:disable-next-line: typedef
+  onItemChange(attributeValue: IProductAttributeValues){
+    
+ }
+
+  // tslint:disable-next-line: typedef
   loadProduct(){
+    this.galleryImages = [];
     this.shopService.getProduct(+this.activateRoute.snapshot.paramMap.get('id')).subscribe(product => {
       this.product = product;
+      console.log('product = ' + product);
+      const baseUrl = window.location.origin + '/';
+      this.product.productImages.forEach(element => {
+        const feed = {
+          small: baseUrl + element.imageThumbUrl,
+          medium: baseUrl + element.imageThumbUrl,
+          big: baseUrl + element.imageBigUrl,
+        };
+        this.galleryImages.push(feed);
+      });
+      console.log(this.product);
       this.bcService.set('@productDetails', product.name);
     }, error => {
       console.log(error);
     });
+  }
+
+  // tslint:disable-next-line: typedef
+  filterAttrValFunction(yourcollection: IProductAttributeValues[], id : number) {  
+    return yourcollection.filter(i => i.productAttributeId === id);
   }
 
 }
