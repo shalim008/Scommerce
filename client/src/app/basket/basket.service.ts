@@ -4,8 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { IBasket, IBasketItem, Basket, IBasketTotals } from '../shared/models/basket';
 import { map } from 'rxjs/operators';
-import { IProduct } from '../shared/models/product';
+import { IProduct, IProductAttributeValues } from '../shared/models/product';
 import { IDeliveryMethod } from '../shared/models/deliveryMethod';
+import { stringify } from '@angular/compiler/src/util';
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +17,12 @@ export class BasketService {
   private basketSource = new BehaviorSubject<IBasket>(null);
   basket$ = this.basketSource.asObservable();
 
-  private basketTotalSource = new BehaviorSubject<IBasketTotals>(null); 
+  private basketTotalSource = new BehaviorSubject<IBasketTotals>(null);
   basketTotal$ = this.basketTotalSource.asObservable();
   shipping = 0;
+  status: boolean;
+  // selectedProdeuctAttribute: string = '';
+
   constructor(private http: HttpClient) { }
 
   // tslint:disable-next-line: typedef
@@ -51,8 +55,9 @@ export class BasketService {
     return this.basketSource.value;
   }
 
-  addItemToBasket(item: IProduct, quantity = 1) {
-    const itemToAdd: IBasketItem = this.mapProductItemToBasketItem(item, quantity);
+  // tslint:disable-next-line: typedef
+  addItemToBasket(item: IProduct, quantity = 1, selectedProductAttributeValues: IProductAttributeValues[]) {
+    const itemToAdd: IBasketItem = this.mapProductItemToBasketItem(item, quantity, selectedProductAttributeValues);
     let basket = this.getCurrentBasketValue();
     if (basket === null) {
       basket = this.createBasket();
@@ -82,10 +87,18 @@ export class BasketService {
   }
 
   removeItemFromBasket(item: IBasketItem) {
+  
     const basket = this.getCurrentBasketValue();
-    if (basket.items.some(x => x.id === item.id)) {
-      basket.items = basket.items.filter(i => i.id !== item.id);
-      if (basket.items.length > 0) {
+
+    if (basket.items.some(x => x.id === item.id && x.type === item.type)) {
+
+       // basket.items = basket.items.filter(i => i.type !== item.type && i.id === item.id);
+        const index: number = basket.items.indexOf(item);
+        if (index !== -1) {
+          basket.items.splice(index, 1);
+        }
+
+        if (basket.items.length > 0) {
         this.setBasket(basket);
       } else {
         this.deleteBasket(basket);
@@ -93,13 +106,13 @@ export class BasketService {
     }
   }
 
-  
+
   deleteLocalBasket(id: string) {
     this.basketSource.next(null);
     this.basketTotalSource.next(null);
     localStorage.removeItem('basket_id');
   }
-  
+
   deleteBasket(basket: IBasket) {
     return this.http.delete(this.baseUrl + 'basket?id=' + basket.id).subscribe(() => {
       this.basketSource.next(null);
@@ -119,15 +132,56 @@ export class BasketService {
   }
 
   private addOrUpdateItem(items: IBasketItem[], itemToAdd: IBasketItem, quantity: number): IBasketItem[] {
-    const index = items.findIndex(i => i.id === itemToAdd.id);
-    if (index === -1) {
-      itemToAdd.quantity = quantity;
-      items.push(itemToAdd);
-    } else {
-      items[index].quantity += quantity;
+    debugger;
+    if (items.length > 0 )
+    {
+      if (itemToAdd.productAttributeValues.length > 0)
+      {
+            let status = false;
+            items.forEach(element => {
+            if ((element.id === itemToAdd.id) && (element.type === itemToAdd.type)) {
+              element.quantity += quantity;
+              status = true;
+            }
+          });
+            if (!status)
+          {
+            itemToAdd.quantity = quantity;
+            items.push(itemToAdd);
+          }
+      }
+      else{
+        const index = items.findIndex(i => i.id === itemToAdd.id);
+        if (index === -1) {
+         itemToAdd.quantity = quantity;
+         items.push(itemToAdd);
+       } else {
+         items[index].quantity += quantity;
+       }
+     }
     }
+    else{
+      const index = items.findIndex(i => i.id === itemToAdd.id);
+      if (index === -1) {
+       itemToAdd.quantity = quantity;
+       items.push(itemToAdd);
+     } else {
+       items[index].quantity += quantity;
+     }
+   }
+
+
+    // const index = items.findIndex(i => i.id === itemToAdd.id);
+    // if (index === -1) {
+    //   itemToAdd.quantity = quantity;
+    //   items.push(itemToAdd);
+    // } else {
+    //   items[index].quantity += quantity;
+    // }
     return items;
   }
+
+
 
   private createBasket(): IBasket {
     const basket = new Basket();
@@ -135,7 +189,14 @@ export class BasketService {
     return basket;
   }
 
-  private mapProductItemToBasketItem(item: IProduct, quantity: number): IBasketItem {
+  // tslint:disable-next-line: max-line-length
+  private mapProductItemToBasketItem(item: IProduct, quantity: number, selectedProductAttributeValues: IProductAttributeValues[]): IBasketItem {
+    let selectedProdeuctAttribute = '';
+   // tslint:disable-next-line: typedef
+    selectedProductAttributeValues.forEach(function(item){
+      selectedProdeuctAttribute += item.attributeValueName + ' | ';
+    });
+
     return {
       id: item.id,
       productName: item.name,
@@ -143,7 +204,8 @@ export class BasketService {
       pictureUrl: item.pictureUrl,
       quantity,
       brand: item.productBrand,
-      type: item.productType
+      type: selectedProdeuctAttribute.slice(0, -2),
+      productAttributeValues: selectedProductAttributeValues
     };
   }
 }

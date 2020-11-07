@@ -16,6 +16,9 @@ export class ProductDetailsComponent implements OnInit {
   quantity = 1;
   galleryOptions: NgxGalleryOptions[];
   galleryImages: NgxGalleryImage[];
+  selectedProductAttributeValues: IProductAttributeValues[] = [];
+  isEnabled = false;
+  
   constructor(private shopService: ShopService,
               private activateRoute: ActivatedRoute,
               private bcService: BreadcrumbService,
@@ -24,7 +27,7 @@ export class ProductDetailsComponent implements OnInit {
               }
 
   ngOnInit(): void {
- 
+
 
     this.galleryOptions = [
       {
@@ -49,7 +52,7 @@ export class ProductDetailsComponent implements OnInit {
           preview: false
       }
   ];
-   
+
 
     this.loadProduct();
 
@@ -76,8 +79,7 @@ export class ProductDetailsComponent implements OnInit {
 
   // tslint:disable-next-line: typedef
   addItemToBasket(){
-    console.log(this.product);
-    this.basketService.addItemToBasket(this.product, this.quantity);
+     this.basketService.addItemToBasket(this.product, this.quantity, this.selectedProductAttributeValues);
   }
 
   // tslint:disable-next-line: typedef
@@ -95,7 +97,20 @@ export class ProductDetailsComponent implements OnInit {
 
   // tslint:disable-next-line: typedef
   onItemChange(attributeValue: IProductAttributeValues){
-    
+    if (this.selectedProductAttributeValues.length > 0)
+    {
+      this.selectedProductAttributeValues.forEach( (item, index) => {
+        if (item.productAttributeId === attributeValue.productAttributeId) {
+           this.selectedProductAttributeValues.splice(index, 1);
+          }
+      });
+    }
+    this.selectedProductAttributeValues.push(attributeValue);
+    if (this.product.productAttribute.length > 0){
+      if (this.selectedProductAttributeValues.length === this.product.productAttribute.length){
+        this.isEnabled = true;
+      }
+    }
  }
 
   // tslint:disable-next-line: typedef
@@ -103,7 +118,11 @@ export class ProductDetailsComponent implements OnInit {
     this.galleryImages = [];
     this.shopService.getProduct(+this.activateRoute.snapshot.paramMap.get('id')).subscribe(product => {
       this.product = product;
-      console.log('product = ' + product);
+
+      if (this.product.productAttribute.length === 0){
+        this.isEnabled = true;
+      }
+      debugger;
       const baseUrl = window.location.origin + '/';
       this.product.productImages.forEach(element => {
         const feed = {
@@ -113,7 +132,7 @@ export class ProductDetailsComponent implements OnInit {
         };
         this.galleryImages.push(feed);
       });
-      console.log(this.product);
+
       this.bcService.set('@productDetails', product.name);
     }, error => {
       console.log(error);
@@ -121,7 +140,7 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   // tslint:disable-next-line: typedef
-  filterAttrValFunction(yourcollection: IProductAttributeValues[], id : number) {  
+  filterAttrValFunction(yourcollection: IProductAttributeValues[], id: number) {
     return yourcollection.filter(i => i.productAttributeId === id);
   }
 

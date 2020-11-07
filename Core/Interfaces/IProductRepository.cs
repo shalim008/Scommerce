@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace Core.Interfaces
 {
@@ -10,5 +11,7 @@ namespace Core.Interfaces
         Task<IReadOnlyList<Product>> GetProductsAsync();
         Task<IReadOnlyList<ProductBrand>> GetProductBrandsAsync();
         Task<IReadOnlyList<ProductType>> GetProductTypesAsync();
+
+        Task<Product> SetProductInfoAsync(Product data, List<IFormFile> gallaryImages, IFormFile FeatureImage);
     }
 }

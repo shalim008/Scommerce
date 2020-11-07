@@ -17,8 +17,9 @@ export class OrdersComponent implements OnInit {
   }
 
   getOrders() {
-    this.ordersService.getOrdersForUser().subscribe((orders: IOrder[]) => {
+    this.ordersService.getOrdersForUser().subscribe((orders: IOrder[]) => {      
       this.orders = orders;
+      console.log(this.orders);
     }, error => {
       console.log(error);
     });

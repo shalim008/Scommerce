@@ -113,6 +113,12 @@ namespace Infrastructure.Data.Migrations
                     b.Property<long>("SetOn")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Type")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VariationIds")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
@@ -128,6 +134,12 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<int>("DataStatus")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("DeliveryFrom")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeliveryTime")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -149,10 +161,16 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(false);
 
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsVirtual")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(false);
+
+                    b.Property<int>("LowStockThreshold")
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("ModifiedOn")
                         .HasColumnType("INTEGER");
@@ -187,6 +205,9 @@ namespace Infrastructure.Data.Migrations
                     b.Property<double>("ProductLength")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("ProductRating")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ProductSKU")
                         .HasColumnType("TEXT")
                         .HasMaxLength(20);
@@ -208,7 +229,7 @@ namespace Infrastructure.Data.Migrations
                     b.Property<long>("SetOn")
                         .HasColumnType("INTEGER");
 
-                    b.Property<double>("StockQuantity")
+                    b.Property<int>("StockQuantity")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -412,6 +433,9 @@ namespace Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("BrandsJson")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("DataStatus")
                         .HasColumnType("INTEGER");
 
@@ -421,7 +445,13 @@ namespace Infrastructure.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ParentProductId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<long>("SetOn")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("VendorRegistrationId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -558,6 +588,12 @@ namespace Infrastructure.Data.Migrations
                                 .HasColumnType("INTEGER");
 
                             b1.Property<string>("ProductName")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Type")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("VariationIds")
                                 .HasColumnType("TEXT");
 
                             b1.HasKey("OrderItemId");

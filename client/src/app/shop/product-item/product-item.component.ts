@@ -9,14 +9,20 @@ import { BasketService } from 'src/app/basket/basket.service';
 })
 export class ProductItemComponent implements OnInit {
 
+  isEnabled = true;
   @Input() product: IProduct;
 
   constructor(private basketService: BasketService) { }
 
   ngOnInit() {
+    if (this.product.productAttribute.length > 0){
+      this.isEnabled = false;
+    }
+
   }
 
   addItemToBasket() {
-    this.basketService.addItemToBasket(this.product);
+    this.basketService.addItemToBasket(this.product, 1, []);
+   // this.basketService.addItemToBasket(this.product);
   }
 }

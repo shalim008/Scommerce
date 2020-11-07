@@ -29,7 +29,7 @@ namespace API
         {
             
             services.AddAutoMapper(typeof(MappingProfiles));
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddDbContext<StoreContext>(x =>
             x.UseSqlite(_config.GetConnectionString("DefaultConnection")));
 

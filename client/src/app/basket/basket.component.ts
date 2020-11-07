@@ -21,6 +21,7 @@ export class BasketComponent implements OnInit {
 
   // tslint:disable-next-line: typedef
   removeBasketItem(item: IBasketItem) {
+    debugger;
     this.basketService.removeItemFromBasket(item);
   }
 

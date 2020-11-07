@@ -1,0 +1,255 @@
+<div class="d-flex justify-content-center mt-5">
+  
+  <div class="col-8" [formGroup]="productEntryForm">
+
+    <app-stepper [linearModeSelected]="false" #appStepper>
+      <cdk-step [label]="'Product'" [completed]="(productEntryForm.get('productDetailsForm')).valid">
+        <div class="mt-4 mb-2" formGroupName="productDetailsForm">
+          <div class="row">
+            <div class="col-lg-6">
+              Product Categories
+              <select class="form-control" formControlName="types" id="types">
+                <option *ngFor="let type of types; let i = index" [value]="types[i].id">
+                  {{types[i].name}}
+                </option>
+              </select>
+            </div>
+            <div class="col-lg-6">
+              Brand Name
+              <select class="form-control" formControlName="brands" id="brands">
+                <option *ngFor="let order of brands; let i = index" [value]="brands[i].id">
+                  {{brands[i].name}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <br />
+          <div class="row">
+            <div class="col-lg-12">
+              <app-text-input formControlName="name" [label]="'Product Title'"></app-text-input>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-12 mb-2">
+              <quill-editor formControlName="description" [styles]="{height: '200px'}" (onFocus)="focus($event)"
+                (onBlur)="blur($event)">
+              </quill-editor>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-4">
+              <app-text-input formControlName="price" [label]="'Offer Price'"></app-text-input>
+            </div>
+            <div class="col-lg-4">
+              <app-text-input formControlName="regularPrice" [label]="'Regular Price'"></app-text-input>
+            </div>
+            <div class="col-lg-4">
+             <select formControlName="isPublished" >
+               <option value="1">Published</option>
+               <option value="0">Draft</option>
+             </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3">
+              <app-text-input formControlName="productWeight" [label]="'Weight'"></app-text-input>
+            </div>
+            <div class="col-lg-3">
+              <app-text-input formControlName="productLength" [label]="'Length'"></app-text-input>
+            </div>
+            <div class="col-lg-3">
+              <app-text-input formControlName="productWidth" [label]="'Width'"></app-text-input>
+            </div>
+            <div class="col-lg-3">
+              <app-text-input formControlName="productHeight" [label]="'Height'"></app-text-input>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-12">
+              Feature Image              
+              <input formControlName="pictureUrl" accept=".gif,.jpg,.jpeg,.png" name="pictureUrl" type="file" class="form-control" (change)="selectFeatureImages($event)" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-12">
+              Gallery Image
+              <input formControlName="productImages" multiple accept=".gif,.jpg,.jpeg,.png" name="productImages" type="file" class="form-control" (change)="selectGalleryImages($event)" />                   
+            </div>
+          </div>
+        </div>
+
+        <div class="float-none d-flex justify-content-between flex-column flex-lg-row mb-5">
+          <button class="btn btn-outline-primary" routerLink="/">
+            <i class="fa fa-angle-left"></i> Back
+          </button>
+          <button class="btn btn-primary" (click)="onSubmit(1)" cdkStepperNext>
+            Go to Inventory Setup <i class="fa fa-angle-right"></i>
+          </button>
+        </div>
+
+      </cdk-step>
+
+      <cdk-step [label]="'Inventory'" [completed]="(productEntryForm.get('productInventoryForm')).valid">
+        <div class="mt-4 mb-2" formGroupName="productInventoryForm">
+
+          <div class="row">
+            <div class="col-lg-6">
+              <app-text-input formControlName="productSKU" [label]="'Product SKU'"></app-text-input>
+            </div>
+            <div class="col-lg-6">
+              <input type="checkbox" formControlName="isManageStock" value="Manage Stock"> Manage Stock
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6">
+              <app-text-input formControlName="stockQuantity" [label]="'Stock Quantity'"></app-text-input>
+            </div>
+            <div class="col-lg-6">
+              <app-text-input formControlName="lowStockThreshold" [label]="'Low stock threshold'"></app-text-input>
+            </div>
+          </div>
+        </div>
+
+        <div class="float-none d-flex justify-content-between flex-column flex-lg-row mb-5">
+          <button class="btn btn-outline-primary" routerLink="/">
+            <i class="fa fa-angle-left"></i> Back
+          </button>
+          <button class="btn btn-primary" (click)="onSubmit(2)" cdkStepperNext>
+            Go to Attribute Setup <i class="fa fa-angle-right"></i>
+          </button>
+        </div>
+
+      </cdk-step>
+
+      <cdk-step [label]="'Attribute'" [completed]="(productEntryForm.get('productAttributeForm')).valid">
+        <div class="mt-4 mb-2" formGroupName="productAttributeForm">
+          <div class="row">
+            <div class="col-lg-6">
+              Attribute
+              <select class="form-control" [(ngModel)]="selectedAttribute" formControlName="productAttrValueMap"
+                id="productAttrValueMap">
+                <option *ngFor="let att of productAttrValueMap; let i = index"
+                  [value]="productAttrValueMap[i].attributeName">
+                  {{productAttrValueMap[i].attributeName}}
+                </option>
+              </select>
+              <input class="btn btn-primary mr-4 mt-2" type="button" value="Add"
+                (click)="addAttributes(selectedAttribute)" />
+
+              <input class="checkbox mt-4" type="checkbox" formControlName="isVisibleOnProductPage"
+                value="Is Visible On Product Page">
+              Visible On Product Page
+              <input type="checkbox" formControlName="isUsedForVariations" value="Is Used For Variations"> Used For
+              Variations
+            </div>
+            <div class="col-lg-6">
+              <input formControlName="attributeName" [(ngModel)]="attributeValueSetup" placeholder="Attribute Name" />
+              <input class="btn btn-primary mr-4 mt-2" type="button" value="Add"
+                (click)="addExtraProductAttribute(attributeValueSetup)" />
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col-lg-12">
+              <table class="table">
+                <th>
+                  Attribute
+                </th>
+                <th>
+                  Values
+                </th>
+                <th>
+                  Action
+                </th>
+                <tr *ngFor="let item of selectedAttributes; let i = index">
+                  <td>
+                    {{item}}
+                  </td>
+                  <td>
+                    <input id="item" (blur)="onKeyBlur($event, item)" type="text"
+                      placeholder="Add Multiple Values with ; Seperator" />
+                  </td>
+                  <td>
+                    <button (click)="removeAttributes(item)" class="btn btn-danger">Remove</button>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="float-none d-flex justify-content-between flex-column flex-lg-row mb-5">
+          <button class="btn btn-outline-primary" routerLink="/">
+            <i class="fa fa-angle-left"></i> Back
+          </button>
+          <button class="btn btn-primary" (click)="onSubmit(3)" cdkStepperNext>
+            Go to Variation Setup <i class="fa fa-angle-right"></i>
+          </button>
+        </div>
+      </cdk-step>
+
+      <cdk-step [label]="'Variation'">
+
+        <div class="mt-4 mb-2" formGroupName="productVariationForm">
+          
+          <div class="row" *ngFor="let item of productAttrValueMap; let i = index">
+            <div class="col-lg-12" *ngIf="item.productAttributeValues.length>0">
+              <div class="row">
+                <div class="col-lg-6">
+                  Attribute
+                  <select class="form-control" formControlName='varAttr' id="productAttributeValue">
+                    <option [value]="item.attributeName">
+                      {{item.attributeName}}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-lg-6">
+                  Attribute Value
+                  <select class="form-control" formControlName='varAttrValue' id="productAttributeValue">
+                    <option *ngFor="let attValue of item.productAttributeValues; let j = index"
+                      [value]="attValue.attributeValueName">
+                      {{attValue.attributeValueName}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-12">
+              <app-text-input formControlName="sku" [label]="'SKU'"></app-text-input>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-12">
+              <quill-editor formControlName="description" [styles]="{height: '200px'}" (onFocus)="focus($event)"
+                (onBlur)="blur($event)">
+              </quill-editor>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-12">
+              Variation Image              
+              <input formControlName="pictureUrl" accept=".gif,.jpg,.jpeg,.png" name="varPictureUrl" type="file" class="form-control" (change)="selectVariationImage($event)" />
+            </div>
+          </div>
+          <button class="btn btn-primary" (click)="addVaiations()">
+            Add Variation <i class="fa fa-angle-right"></i>
+          </button>
+        </div>
+
+        <div class="float-none d-flex justify-content-between flex-column flex-lg-row mb-5">
+          <button class="btn btn-outline-primary" routerLink="/">
+            <i class="fa fa-angle-left"></i> Back
+          </button>
+          <button class="btn btn-primary" cdkStepperNext>
+            SAVE <i class="fa fa-angle-right"></i>
+          </button>
+        </div>
+
+      </cdk-step>
+    </app-stepper>
+
+  </div>
+</div>

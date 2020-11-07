@@ -5,7 +5,7 @@ import { IBrand } from '../shared/models/brand';
 import { IType } from '../shared/models/productType';
 import { map } from 'rxjs/operators';
 import { ShopParams } from '../shared/models/shopParams';
-import { IProduct } from '../shared/models/product';
+import { IProduct, IProductAttribute, IProductAttrValueMap } from '../shared/models/product';
 import { of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -18,6 +18,8 @@ export class ShopService {
   products: IProduct[] = [];
   brands: IBrand[] = [];
   types: IType[] = [];
+  productAttribute: IProductAttribute[] = [];
+  productAttrValueMap: IProductAttrValueMap[] = [];
   pagination = new Pagination();
   shopParams = new ShopParams();
 
@@ -108,5 +110,75 @@ export class ShopService {
       })
     );
   }
+
+  // tslint:disable-next-line: typedef
+  getAttributes() {
+    if (this.productAttribute.length > 0) {
+      return of(this.productAttribute);
+    }
+    return this.http.get<IProductAttribute[]>(this.baseUrl + 'products/productAttribute').pipe(
+      map(response => {
+        this.productAttribute = response;
+        return response;
+      })
+    );
+  }
+
+
+  // tslint:disable-next-line: typedef
+  getAttributeValueMap() {
+    if (this.productAttrValueMap.length > 0) {
+      return of(this.productAttrValueMap);
+    }
+    return this.http.get<IProductAttrValueMap[]>(this.baseUrl + 'products/productAttribute').pipe(
+      map(response => {
+        response.forEach(element => {
+          this.productAttrValueMap.push(
+            {
+              id: element.id, attributeName: element.attributeName, productAttributeValues: []
+            });
+        });
+        return this.productAttrValueMap;
+      })
+    );
+  }
+
+    setProductInfo(values: any, param: number) {
+      const input = new FormData();
+      input.append('name', values.productDetailsForm.name);
+      input.append('description', values.productDetailsForm.description);
+      input.append('price', values.productDetailsForm.price);
+      input.append('regularPrice', values.productDetailsForm.regularPrice);
+      input.append('productWeight', values.productDetailsForm.productWeight);
+      input.append('productLength', values.productDetailsForm.productLength);
+      input.append('productWidth', values.productDetailsForm.productWidth);
+      input.append('productHeight', values.productDetailsForm.productHeight);
+      input.append('pictureUrl', values.productDetailsForm.pictureUrl);
+      input.append('pictureFile', values.productDetailsForm.pictureFile);
+
+      for (let i = 0; i < values.productDetailsForm.gallaryImages.length; i++) {
+      input.append('gallaryImages', values.productDetailsForm.gallaryImages[i]);
+    }
+    
+      input.append('productImages', values.productDetailsForm.productImages);
+    
+      input.append('isPublished', values.productDetailsForm.isPublished);
+      input.append('types', values.productDetailsForm.types);
+      input.append('brands', values.productDetailsForm.brands);
+
+      if (param === 1){
+        debugger;
+        return this.http.post(this.baseUrl + 'products/product-info', input).pipe(
+          map((response) => {
+            if (response) {
+              console.log('Sucess');
+              return response;
+            }
+          })
+        );
+      }
+
+    }
+
 
 }

@@ -4,9 +4,11 @@ export interface IProduct {
     description: string;
     price: number;
     pictureUrl: string;
+    pictureFile: File;
     productType: string;
     productBrand: string;
     productImages: IProductImages[];
+    gallaryImages: File[];
     productAttribute: IProductAttribute[];
     productAttributeValues: IProductAttributeValues[];
 }
@@ -17,6 +19,7 @@ export interface IProductVariations {
     description: string;
     price: number;
     pictureUrl: string;
+    varPictureUrl: File;
     regularPrice: string;
     stockQuantity: string;
     productWeight: string;
@@ -51,3 +54,10 @@ export interface IProductAttributeValues {
     attributeValueParentId: string;
     productAttributeId: number;
 }
+
+export interface IProductAttrValueMap{
+    id: number;
+    attributeName: string;
+    productAttributeValues: IProductAttributeValues[];
+}
+

@@ -20,15 +20,26 @@ namespace API.Controllers
         private readonly IGenericRepository<Product> _productsRepo;
         private readonly IGenericRepository<ProductBrand> _productBrandRepo;
         private readonly IGenericRepository<ProductType> _productTypeRepo;
+        private readonly IGenericRepository<ProductAttribute> _productAttrRepo;
+        private readonly IGenericRepository<ProductAttributeValues> _productAttrValuesRepo;
+        private readonly IProductRepository _prodRepo;
         private readonly IMapper _mapper;
 
-        public ProductsController(IGenericRepository<Product> productsRepo, IGenericRepository<ProductBrand> productBrandRepo, IGenericRepository<ProductType> productTypeRepo, IMapper mapper)
+        public ProductsController(IGenericRepository<Product> productsRepo, 
+        IGenericRepository<ProductBrand> productBrandRepo, 
+        IGenericRepository<ProductType> productTypeRepo, 
+        IGenericRepository<ProductAttribute> productAttrRepo, 
+        IGenericRepository<ProductAttributeValues> productAttrValuesRepo, 
+        IProductRepository prodRepo,
+        IMapper mapper)
         {
             _mapper = mapper;
             _productTypeRepo = productTypeRepo;
             _productBrandRepo = productBrandRepo;
             _productsRepo = productsRepo;
-
+            _productAttrRepo = productAttrRepo;
+            _productAttrValuesRepo = productAttrValuesRepo;
+            _prodRepo = prodRepo;
         }
         
         [Cached(600)]
@@ -71,14 +82,47 @@ namespace API.Controllers
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
         {
-            return Ok(await _productBrandRepo.ListAllAsync());
+            var data = await _productBrandRepo.ListAllAsync();
+            return Ok(data.Where(ob=>ob.DataStatus !=0));
         }
 
         [Cached(600)]
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductTypes()
         {
-            return Ok(await _productTypeRepo.ListAllAsync());
+            var data = await _productTypeRepo.ListAllAsync();
+            return Ok(data.Where(ob=>ob.DataStatus !=0));
         }
+
+        [Cached(600)]
+        [HttpGet("productAttribute")]
+        public async Task<ActionResult<IReadOnlyList<ProductAttribute>>> GetProductAttributes()
+        {
+            var data = await _productAttrRepo.ListAllAsync();
+            return Ok(data.Where(ob=>ob.DataStatus !=0));
+        }
+
+        [Cached(600)]
+        [HttpGet("productAttributeValues")]
+        public async Task<ActionResult<IReadOnlyList<ProductAttributeValues>>> GetProductAttributeValues(int id)
+        {
+            // Need to Improve
+            var data = await _productAttrValuesRepo.ListAllAsync();
+            return Ok(data.Where(ob=>ob.DataStatus !=0 && ob.Id == id).Select(ob=>ob.AttributeValueName).Distinct());
+        }
+
+        [HttpPost("product-info")]
+        public async Task<ActionResult<ProductDetailsForm>> ProductEntry([FromForm]ProductDetailsForm values)
+        {                   
+             IFormFile  pictureFile = values.PictureFile;
+             List<IFormFile> gallaryImages = values.GallaryImages;
+             var productInfo = _mapper.Map<Product>(values);
+             productInfo.ProductBrandId = values.Brands;
+             productInfo.ProductTypeId = values.Types;
+             var data = await _prodRepo.SetProductInfoAsync(productInfo, gallaryImages, pictureFile);
+             return Ok(data);
+        }
+
+
     }
 }
